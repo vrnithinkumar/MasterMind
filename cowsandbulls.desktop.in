@@ -1,0 +1,8 @@
+[Desktop Entry]
+_Name=Cowsandbulls
+_Comment=Cowsandbulls application
+Categories=GNOME;Utility;
+Exec=cowsandbulls
+Icon=cowsandbulls
+Terminal=false
+Type=Application

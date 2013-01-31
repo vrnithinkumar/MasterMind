@@ -1,0 +1,138 @@
+# -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
+### BEGIN LICENSE
+# This file is in the public domain
+### END LICENSE
+import random
+import gettext
+
+from gettext import gettext as _
+gettext.textdomain('cowsandbulls')
+
+from gi.repository import Gtk # pylint: disable=E0611
+import logging
+logger = logging.getLogger('cowsandbulls')
+
+from cowsandbulls_lib import Window
+from cowsandbulls.AboutCowsandbullsDialog import AboutCowsandbullsDialog
+from cowsandbulls.PreferencesCowsandbullsDialog import PreferencesCowsandbullsDialog
+
+
+chance=0
+histr="...History..."
+bulls=0
+cows=0
+chance=0
+numb=random.randint(100,999)
+print numb
+
+
+# See cowsandbulls_lib.Window.py for more details about how this class works
+numb=random.randint(100,999)
+class CowsandbullsWindow(Window):
+    __gtype_name__ = "CowsandbullsWindow"
+    
+    def finish_initializing(self, builder): # pylint: disable=E1002
+        """Set up the main window"""
+        super(CowsandbullsWindow, self).finish_initializing(builder)
+
+        self.AboutDialog = AboutCowsandbullsDialog
+        self.PreferencesDialog = PreferencesCowsandbullsDialog
+
+        # Code for other initialization actions should be added here.
+
+        self.submitbutton=self.builder.get_object("submitbutton")
+        self.readans=self.builder.get_object("readans")
+        self.cow=self.builder.get_object("cow")
+        self.history=self.builder.get_object("history")
+        self.bull=self.builder.get_object("bull")
+        self.cowpic=self.builder.get_object("image1")
+        self.bullpic=self.builder.get_object("image3")
+        self.status=self.builder.get_object("status")
+        self.toolbutton3=self.builder.get_object("toolbutton3")
+        self.toolbutton2=self.builder.get_object("toolbutton2")
+        self.toolbutton1=self.builder.get_object("toolbutton1")
+        self.cowpic.show()
+        self.bullpic.show()
+
+
+                #main game codes
+    def undos(self):
+        global histr
+        global chance
+        chance=chance-1
+        histr=histr[0:-24]
+        self.history.set_text(histr)
+        self.status.set_text("Chance : "+str(chance))
+ 
+    def reset(self):
+        global cows
+    	global bulls
+	    global chance
+        global numb
+        global histr
+        cows=bulls=chance=0
+        histr=""
+        numb=random.randint(100,999)
+        self.history.set_text("New game Starting...")
+        self.status.set_text("...New Game Started...")
+
+    def showme (self):
+        self.history.set_text("The Number is "+str(numb))
+        self.status.set_text("...You just Gave up...")
+        
+    def examine (self):
+	    global cows
+    	global bulls
+	    global chance
+        global numb
+        global histr
+       #s print numb
+        guess=self.readans.get_text()
+	    bulls=0
+	    cows=0
+	    numar=str(numb)
+	    for i in range(0,3):
+	    	for j in range(0,3):
+	    		if numar[i]==guess[j]:
+	    			if i==j:
+	    				bulls=bulls+1
+	    			else:
+	    				cows=cows+1
+	    chance=chance+1
+        chances="Chance : "+str(chance)
+        string=str(chance)+")"+"for "+self.readans.get_text()+" Cows="+str(cows)+" Bulls="+str(bulls)
+        cowstr="Number of Cows\n"+str(cows)
+        bullstr="Number of Bulls\n"+str(bulls)
+        self.cow.set_text(cowstr)
+        self.bull.set_text(bullstr)
+        histr=histr+"\n"+string
+        self.history.set_text(histr)
+        self.readans.set_text("")
+        self.status.set_text(chances)
+        if bulls==3:
+            self.history.set_text("Congratz Master Mind...You Won.....\n You took "+str(chance)+"chances")
+            self.readans.set_text("")
+            self.status.set_text("You are a great maths wizard..")
+        
+        
+
+    def on_submitbutton_clicked(self,widget):
+        self.examine()
+        
+    def on_readans_activate(self,widget):
+        self.examine()
+
+    def on_toolbutton3_clicked(self,widget):
+        global chance        
+        if chance>0:
+            self.undos()
+        else:
+            self.status.set_text("No more Undo...")
+
+    def on_toolbutton2_clicked(self,widget):
+        self.showme()
+
+    def on_toolbutton1_clicked(self,widget):
+        self.reset()
+
+
